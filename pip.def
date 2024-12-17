@@ -1,8 +1,14 @@
 Bootstrap: docker
 From: nvcr.io/nvidia/jax:23.08-py3
 
+%files
+    test_jax.py
+    test_pymc.py
+    test_numpyro.py
+
 %post
-    pip install --upgrade pip && \
+    pip install --upgrade pip && 
+    pip install --no-cache-dir \
         polars pandas openpyxl pyarrow \
         seaborn matplotlib imageio \
         pymc numpyro[cuda] bambi \
@@ -11,6 +17,6 @@ From: nvcr.io/nvidia/jax:23.08-py3
         relplot numpy
 
 %test
-    python jax.py
-    python pymc.py
-    python numpyro.py
+    python /test_jax.py
+    python /test_pymc.py
+    python /test_numpyro.py
