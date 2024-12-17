@@ -1,27 +1,28 @@
 Bootstrap: docker
-From: nvcr.io/nvidia/jax:23.08-py3
+From: nvcr.io/nvidia/jax:24.10-py3
 
 %files
     test_jax.py
     test_pymc.py
-    test_numpyro.py
     test_pyvista.py
+    test_numpyro.py
 
 %post
     export DEBIAN_FRONTEND=noninteractive
     apt-get update && \
     apt-get install -y xvfb libgl1-mesa-dev
 
-    pip install --upgrade pip && \
-    pip install --no-cache-dir \
-        polars pandas openpyxl pyarrow \
-        seaborn matplotlib imageio \
-        pymc numpyro[cuda] bambi \
-        tqdm \
-        ipython scipy \
-        relplot numpy
+    export PIP_TMP=/tmp/pip-cache
+    mkdir -p $PIP_TMP
+    pip install --cache-dir $PIP_TMP pyvista pymc numpyro pandas numpy scipy polars openpyxl pyarrow imageio seaborn tqdm relplot xlsxwriter 
 
 %test
+    # pytensor and matplotlib need work folders
+    # in the build-step of the container, the default folder is not writeable
+    # we'll use these instead
+    export PYTENSOR_FLAGS='base_compiledir=/tmp/.pytensor' 
+    export MPLCONFIGDIR=/tmp/matplotlib-123
+    mkdir -p $MPLCONFIGDIR
     python /test_pyvista.py
     python /test_jax.py
     python /test_pymc.py
