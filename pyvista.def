@@ -1,0 +1,20 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/jax:23.08-py3
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get install -y xvfb libgl1-mesa-dev
+
+    pip install --upgrade pip && \
+        polars pandas openpyxl pyarrow \
+        seaborn matplotlib imageio \
+        pymc numpyro[cuda] bambi \
+        tqdm \
+        ipython scipy \
+        relplot numpy
+
+%test
+    python pyvista.py
+    python jax.py
+    python pymc.py
+    python numpyro.py
